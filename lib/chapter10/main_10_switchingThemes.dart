@@ -27,21 +27,22 @@ class _BooksAppState extends State<BooksApp> {
       theme: currentTheme == AppThemes.light ? defaultTheme : darkTheme,
       home: Scaffold(
         appBar: AppBar(
-            leading: Icon(Icons.home),
-            title: Text("Books Listing"),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.all_inclusive),
-                //NEW CODE: Toggling from light to dark theme and vice versa
-                onPressed: () {
-                  setState(() {
-                    currentTheme = currentTheme == AppThemes.light
-                        ? AppThemes.dark
-                        : AppThemes.light;
-                  });
-                },
-              )
-            ]),
+          leading: Icon(Icons.home),
+          title: Text("Books Listing"),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.all_inclusive),
+              //NEW CODE: Toggling between themes
+              onPressed: () {
+                setState(() {
+                  currentTheme = currentTheme == AppThemes.light
+                      ? AppThemes.dark
+                      : AppThemes.light;
+                });
+              },
+            )
+          ],
+        ),
         body: BooksListing(),
       ),
     );
@@ -69,7 +70,7 @@ class BooksListing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: booksListing == null ? 0 : booksListing.length,
+      itemCount: booksListing.length,
       itemBuilder: (context, index) {
         return Card(
           shape: RoundedRectangleBorder(
@@ -89,23 +90,21 @@ class BooksListing extends StatelessWidget {
                       Text(
                         '${booksListing[index]['title']}',
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      booksListing[index]['authors'] != null
-                          ? Text(
-                              'Author(s): ${booksListing[index]['authors'].join(", ")}',
-                              style: TextStyle(fontSize: 14),
-                            )
-                          : Text(""),
+                      Text(
+                        'Author(s): ${booksListing[index]['authors'].join(", ")}',
+                        style: TextStyle(fontSize: 14),
+                      ),
                     ],
                   ),
                 ),
-                booksListing[index]['image'] != null
-                    ? Image.asset(
-                        booksListing[index]['image'],
-                        fit: BoxFit.fill,
-                      )
-                    : Container(),
+                Image.asset(
+                  booksListing[index]['image'],
+                  fit: BoxFit.fill,
+                ),
               ],
             ),
           ),

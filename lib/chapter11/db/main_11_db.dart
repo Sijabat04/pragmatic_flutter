@@ -1,70 +1,80 @@
-//Persisting selected theme using Database
+// Persisting selected theme using Database
 import 'package:flutter/material.dart';
 
 import '../themes.dart';
 import 'plugins/shared.dart';
 import 'theme_prefs.dart';
 
-//Uncomment the line below to run from this file
-void main() => runApp(BooksApp());
+void main() => runApp(const BooksApp());
 
-//Showing book listing in ListView
 class BooksApp extends StatefulWidget {
+  const BooksApp({super.key});
+
   @override
-  _BooksAppState createState() => _BooksAppState();
+  State<BooksApp> createState() => _BooksAppState();
 }
 
 class _BooksAppState extends State<BooksApp> {
   AppThemes currentTheme = AppThemes.light;
-  MyDatabase _database;
+  late MyDatabase _database;
 
-  //NEW CODE: Fetching theme_id DB
-  void loadActiveTheme(BuildContext context) async {
-    ThemePref themePref = await _database.getActiveTheme();
-    setState(() {
-      currentTheme = AppThemes.values[themePref.themeId];
-    });
+  // ================== LOAD THEME FROM DB ==================
+  Future<void> loadActiveTheme() async {
+    try {
+      final themeData = await _database.getActiveTheme();
+
+      if (!mounted) return;
+
+      setState(() {
+        currentTheme = AppThemes.values[themeData.themeId];
+      });
+    } catch (e) {
+      // Jika DB kosong / error → fallback
+      setState(() {
+        currentTheme = AppThemes.light;
+      });
+    }
   }
 
-  //NEW CODE: Save theme_id in DB
+  // ================== SWITCH THEME ==================
   Future<void> switchTheme() async {
-    var oldTheme = currentTheme;
+    final oldTheme = currentTheme;
 
-    currentTheme == AppThemes.light
-        ? currentTheme = AppThemes.dark
-        : currentTheme = AppThemes.light;
-
-    //check if theme_id entry exists in table already
-    var isOldThemeActive = _database.themeIdExists(oldTheme.index);
-
-    //Only active theme id is present in the db.
-    // Remove any existing theme id from DB before adding new entry
-    if (isOldThemeActive != null) {
-      _database.deactivateTheme(oldTheme.index);
-    }
+    // Update UI dulu
     setState(() {
-      _database.activateTheme(currentTheme);
+      currentTheme =
+          currentTheme == AppThemes.light ? AppThemes.dark : AppThemes.light;
     });
+
+    // Cek apakah theme lama ada di DB
+    final bool exists = await _database.themeIdExists(oldTheme.index);
+
+// Hapus theme lama jika ada
+    if (exists) {
+      await _database.deactivateTheme(oldTheme.index);
+    }
+
+// Simpan theme baru
+    await _database.activateTheme(currentTheme);
   }
 
   @override
   void initState() {
     super.initState();
 
-    //NEW CODE: Initializing DB
+    // Init database
     _database = constructDb(logStatements: true);
 
-    //NEW CODE: Loading theme from DB
-    loadActiveTheme(context);
+    // Load theme dari database
+    loadActiveTheme();
   }
 
   @override
   void dispose() {
     super.dispose();
-    //NEW CODE: Don't forget to close the DB
-    _database.close();
   }
 
+  // ================== UI ==================
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -72,78 +82,83 @@ class _BooksAppState extends State<BooksApp> {
       theme: currentTheme == AppThemes.light ? defaultTheme : darkTheme,
       home: Scaffold(
         appBar: AppBar(
-            leading: Icon(Icons.home),
-            title: Text("Books Listing"),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.all_inclusive),
-                onPressed: () => switchTheme(),
-              )
-            ]),
-        body: BooksListing(),
+          leading: const Icon(Icons.home),
+          title: const Text("Books Listing"),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.brightness_6),
+              onPressed: switchTheme,
+            )
+          ],
+        ),
+        body: const BooksListing(),
       ),
     );
   }
 }
 
-List bookData() {
+// ================== BOOK DATA ==================
+List<Map<String, dynamic>> bookData() {
   return [
     {
       'title': 'Book Title',
       'authors': ['Author1', 'Author2'],
-      'image': 'assets/book_cover.png'
+      'image': 'assets/book_cover.png',
     },
     {
       'title': 'Book Title 2',
       'authors': ['Author1'],
-      'image': 'assets/book_cover.png'
+      'image': 'assets/book_cover.png',
     }
   ];
 }
 
+// ================== BOOK LISTING ==================
 class BooksListing extends StatelessWidget {
-  final booksListing = bookData();
+  const BooksListing({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final booksListing = bookData();
+
     return ListView.builder(
-      itemCount: booksListing == null ? 0 : booksListing.length,
+      itemCount: booksListing.length,
       itemBuilder: (context, index) {
+        final book = booksListing[index];
+
         return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
           elevation: 5,
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
+                    children: [
                       Text(
-                        '${booksListing[index]['title']}',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
+                        book['title'],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      booksListing[index]['authors'] != null
-                          ? Text(
-                              'Author(s): ${booksListing[index]['authors'].join(", ")}',
-                              style: TextStyle(fontSize: 14),
-                            )
-                          : Text(""),
+                      Text(
+                        'Author(s): ${book['authors'].join(", ")}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
                     ],
                   ),
                 ),
-                booksListing[index]['image'] != null
-                    ? Image.asset(
-                        booksListing[index]['image'],
-                        fit: BoxFit.fill,
-                      )
-                    : Container(),
+                Image.asset(
+                  book['image'],
+                  width: 60,
+                  fit: BoxFit.cover,
+                ),
               ],
             ),
           ),

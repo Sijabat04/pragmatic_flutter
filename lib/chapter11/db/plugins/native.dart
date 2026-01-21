@@ -1,30 +1,40 @@
 import 'dart:io';
 
-import 'package:moor/ffi.dart';
-import 'package:moor/moor.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart' as paths;
 
 import '../theme_prefs.dart';
 
-//Note: Implementation borrowed from this To Do App Template project
-//https://github.com/appleeducate/moor_shared
+// Construct database for all platforms
 MyDatabase constructDb({bool logStatements = false}) {
   if (Platform.isIOS || Platform.isAndroid) {
     final executor = LazyDatabase(() async {
       final dataDir = await paths.getApplicationDocumentsDirectory();
       final dbFile = File(p.join(dataDir.path, 'db.sqlite'));
-      return VmDatabase(dbFile, logStatements: logStatements);
+      return NativeDatabase(
+        dbFile,
+        logStatements: logStatements,
+      );
     });
     return MyDatabase(executor);
   }
-  if (Platform.isMacOS || Platform.isLinux) {
+
+  if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
     final file = File('db.sqlite');
-    return MyDatabase(VmDatabase(file, logStatements: logStatements));
+    return MyDatabase(
+      NativeDatabase(
+        file,
+        logStatements: logStatements,
+      ),
+    );
   }
-  if (Platform.isWindows) {
-    final file = File('db.sqlite');
-    return MyDatabase(VmDatabase(file, logStatements: logStatements));
-  }
-  return MyDatabase(VmDatabase.memory(logStatements: logStatements));
+
+  // Web or fallback
+  return MyDatabase(
+    NativeDatabase.memory(
+      logStatements: logStatements,
+    ),
+  );
 }

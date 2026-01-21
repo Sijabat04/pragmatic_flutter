@@ -1,62 +1,69 @@
-import 'package:moor/moor.dart';
-
+import 'package:drift/drift.dart';
 import '../themes.dart';
 
 part 'theme_prefs.g.dart';
 
-// It will generate a table called "theme_prefs" for us. The rows of that table will
-// be represented by a class called "ThemePref".
 class ThemePrefs extends Table {
-  // AppThemes id
   IntColumn get themeId => integer()();
   TextColumn get themeName => text()();
 }
 
-// Moor prepares database table
-@UseMoor(tables: [ThemePrefs])
+@DriftDatabase(tables: [ThemePrefs])
 class MyDatabase extends _$MyDatabase {
   MyDatabase(QueryExecutor e) : super(e);
 
-  // Bump schemaVersion whenever there's change.
   @override
   int get schemaVersion => 1;
 
-  //Keeping it simple
-  //reset the database whenever there's update.
-  // Add light theme as default theme after first launch and upgrade
   @override
-  MigrationStrategy get migration {
-    return MigrationStrategy(onCreate: (Migrator m) {
-      return m.createAll();
-    }, onUpgrade: (Migrator m, int from, int to) async {
-      m.deleteTable(themePrefs.actualTableName);
-      m.createAll();
-    }, beforeOpen: (details) async {
-      if (details.wasCreated) {
-        await into(themePrefs).insert(ThemePrefsCompanion(
-          themeId: const Value(0),
-          themeName: Value(AppThemes.light.toString()),
-        ));
-      }
-    });
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          await m.deleteTable(themePrefs.actualTableName);
+          await m.createAll();
+        },
+        beforeOpen: (details) async {
+          if (details.wasCreated) {
+            await into(themePrefs).insert(
+              ThemePrefsCompanion.insert(
+                themeId: 0,
+                themeName: AppThemes.light.toString(),
+              ),
+            );
+          }
+        },
+      );
+
+  // ================= FIXED METHODS =================
+
+  /// SIMPAN THEME
+  Future<void> activateTheme(AppThemes theme) async {
+    await into(themePrefs).insert(
+      ThemePrefsCompanion.insert(
+        themeId: theme.index,
+        themeName: theme.toString(),
+      ),
+      mode: InsertMode.insertOrReplace,
+    );
   }
 
-  void activateTheme(AppThemes theme) {
-    ThemePref pref =
-        ThemePref(themeId: theme.index, themeName: theme.toString());
-    into(themePrefs).insert(pref);
+  /// HAPUS THEME
+  Future<void> deactivateTheme(int id) async {
+    await (delete(themePrefs)
+          ..where((tbl) => tbl.themeId.equals(id)))
+        .go();
   }
 
-  void deactivateTheme(int i) =>
-      (delete(themePrefs)..where((t) => t.themeId.equals(i))).go();
+  /// CEK THEME ADA ATAU TIDAK
+  Future<bool> themeIdExists(int id) async {
+    final result = await (select(themePrefs)
+          ..where((tbl) => tbl.themeId.equals(id)))
+        .get();
 
-  //The stream will automatically emit new items whenever the underlying data changes.
-  Stream<bool> themeIdExists(int id) {
-    return select(themePrefs)
-        .watch()
-        .map((prefs) => prefs.any((pref) => pref.themeId == id));
+    return result.isNotEmpty;
   }
 
+  /// AMBIL THEME AKTIF
   Future<ThemePref> getActiveTheme() {
     return select(themePrefs).getSingle();
   }

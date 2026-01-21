@@ -3,34 +3,31 @@
 import 'package:flutter/material.dart';
 
 /// Chapter10: Flutter Themes
-//Uncomment the line below to run from this file
 //void main() => runApp(BooksApp());
 
 ThemeData defaultTheme = ThemeData(
-  // Define the default brightness and colors for the overall app.
   brightness: Brightness.light,
   primaryColor: Colors.blue,
-  accentColor: Colors.lightBlueAccent,
+  colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+      .copyWith(secondary: Colors.lightBlueAccent),
   appBarTheme: AppBarTheme(
-    color: Colors.blue,
-    iconTheme: IconThemeData(
-      color: Colors.white,
-    ),
+    backgroundColor: Colors.blue,
+    iconTheme: IconThemeData(color: Colors.white),
   ),
 );
 
 ThemeData pinkTheme = ThemeData(
-  // Define the default brightness and colors for the overall app.
   brightness: Brightness.light,
   primaryColor: Colors.pink,
-  accentColor: Colors.pinkAccent,
+  colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.pink)
+      .copyWith(secondary: Colors.pinkAccent),
 );
 
 ThemeData darkTheme = ThemeData(
-  // Define the default brightness and colors for the overall app.
   brightness: Brightness.dark,
   primaryColor: Colors.orange,
-  accentColor: Colors.yellowAccent,
+  colorScheme: ColorScheme.fromSwatch(brightness: Brightness.dark)
+      .copyWith(secondary: Colors.yellowAccent),
 );
 
 //Showing book listing in ListView
@@ -74,7 +71,7 @@ class BooksListing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: booksListing == null ? 0 : booksListing.length,
+      itemCount: booksListing.length, // ✔ fixed unnecessary null check
       itemBuilder: (context, index) {
         return Card(
           shape: RoundedRectangleBorder(
@@ -94,7 +91,9 @@ class BooksListing extends StatelessWidget {
                       Text(
                         '${booksListing[index]['title']}',
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       booksListing[index]['authors'] != null
                           ? Text(

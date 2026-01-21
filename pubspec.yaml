@@ -1,104 +1,63 @@
 name: pragmatic_flutter
 description: A new Flutter project.
+publish_to: 'none'
 
-# The following line prevents the package from being accidentally published to
-# pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  http: ^0.13.3
+  http: ^1.2.0
+  url_launcher: ^6.3.2
 
-#  flutter_html: ^0.11.1
+  provider: ^6.0.5
+  flutter_bloc: ^8.1.4
+  shared_preferences: ^2.2.3
 
-  #To open web reader link and buylink from BookDetailsPage
-  url_launcher: ^6.0.9
-
-  #Provider package
-  provider:  #^4.3.2
-
-  #flutter_bloc package
-  flutter_bloc: ^7.0.1
-
-  #SharedPreference-persisting theme selection
-  shared_preferences: ^2.0.6
-
-  #Moor plugin- Persisting theme selection
-  moor: ^4.4.1
+  # Drift (Moor replacement)
+  drift: ^2.17.0
+  drift_sqflite: ^2.0.0
   sqlite3_flutter_libs: ^0.5.0
-  # Helper to find the database path on mobile
-  path_provider: ^2.0.2
-  path: ^1.8.0
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.3
+  path_provider: ^2.1.3
+  path: ^1.9.0
 
-  #Flutter Icons
-  font_awesome_flutter: ^9.1.0
+  cupertino_icons: ^1.0.8
+  font_awesome_flutter: ^10.7.0
 
-  # Chapter08
-  animated_floatactionbuttons: ^0.1.0
-  syntax_highlighter: ^0.1.0
+  flutter_speed_dial: ^7.0.0
+  flutter_highlight: ^0.7.0
 
-  # Chapter15 (launcher icons for BooksApp)
-  flutter_launcher_icons: ^0.9.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
-  #Integration Testing
-  flutter_driver:
-    sdk: flutter
-
-  #Widget Testing
   flutter_test:
     sdk: flutter
 
-  #Unit Testing
-  test: ^1.16.8
+  # Integration test (replaces flutter_driver)
+  integration_test:
+    sdk: flutter
 
-  #Generates files using Dart code.
-  build_runner: ^2.0.6
+  test: ^1.24.9
 
-  #This generator library turns Table classes from moor into database code.
-  moor_generator: ^4.6.0+1
+  # Drift codegen
+  drift_dev: ^2.17.0
+  build_runner: ^2.4.11
 
-
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter.
 flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/book_cover.png
-     - assets/flutter_icon.png
-     - lib/chapter06/widgets/
-     - lib/chapter07/layouts/single/
-     - lib/chapter07/layouts/multi/
-     - lib/chapter08/layouts/
+    - assets/book_cover.png
+    - assets/flutter_icon.png
+    - lib/chapter06/widgets/
+    - lib/chapter07/layouts/single/
+    - lib/chapter07/layouts/multi/
+    - lib/chapter08/layouts/
 
   fonts:
     - family: Pangolin
@@ -112,30 +71,6 @@ flutter_icons:
   image_path_android: "assets/launcher/app_logo.png"
   adaptive_icon_background: "assets/launcher/app_logo_background.png"
   adaptive_icon_foreground: "assets/launcher/app_logo.png"
-
-
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/assets-and-images/#resolution-aware.
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/assets-and-images/#from-packages
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
+dependency_overrides:
+  watcher: ^1.1.0
+  file: ^7.0.0

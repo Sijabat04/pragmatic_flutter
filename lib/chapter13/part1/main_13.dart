@@ -1,60 +1,64 @@
-//importing the Dart package
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import '../../config.dart';
+import '../../../config.dart';
 import 'booktile.dart';
 
-/// Chapter13: Data Modeling
-///
-//Uncomment the line below to run from this file
-void main() => runApp(BooksApp());
+void main() => runApp(const BooksApp());
 
-//Showing book listing in ListView
 class BooksApp extends StatelessWidget {
+  const BooksApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: BooksListing(),
+      theme: ThemeData(primarySwatch: Colors.indigo),
+      home: const BooksListing(),
     );
   }
 }
 
-//Making HTTP request
-//Function to make REST API call
-Future<dynamic> makeHttpCall() async {
-  //API Key: To be replaced with your key
-  final apiKey = "$YOUR_API_KEY";
-  final apiEndpoint =
-      "https://www.googleapis.com/books/v1/volumes?key=$apiKey&q=python+coding";
-  final http.Response response = await http
-      .get(Uri.parse(apiEndpoint), headers: {'Accept': 'application/json'});
-
-  //Parsing API's HttpResponse to JSON format
-  //Converting string response body to JSON representation
-  final jsonObject = json.decode(response.body);
-
-  //Prints JSON formatted response on console
-  print(jsonObject);
-  return jsonObject;
-}
-
 class BooksListing extends StatefulWidget {
+  const BooksListing({Key? key}) : super(key: key);
+
   @override
-  _BooksListingState createState() => _BooksListingState();
+  State<BooksListing> createState() => _BooksListingState();
 }
 
 class _BooksListingState extends State<BooksListing> {
-  var booksListing;
-  fetchBooks() async {
-    var response = await makeHttpCall();
+  List<dynamic> booksListing = [];
+  bool isLoading = false;
 
-    setState(() {
-      booksListing = response["items"];
-    });
+  Future<void> fetchBooks() async {
+    if (!mounted) return;
+
+    setState(() => isLoading = true);
+
+    final url = Uri.parse(
+      'https://www.googleapis.com/books/v1/volumes?q=python+coding&key=$YOUR_API_KEY',
+    );
+
+    try {
+      final response = await http.get(url).timeout(const Duration(seconds: 10));
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          booksListing = data['items'] ?? [];
+        });
+      } else {
+        setState(() => booksListing = []);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => booksListing = []);
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -66,15 +70,21 @@ class _BooksListingState extends State<BooksListing> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Books Listing"),
+      appBar: AppBar(title: const Text('Books Listing')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: fetchBooks,
+        child: const Icon(Icons.refresh),
       ),
-      body: ListView.builder(
-        itemCount: booksListing == null ? 0 : booksListing.length,
-        itemBuilder: (context, index) {
-          return BookTile(book: booksListing[index]);
-        },
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : booksListing.isEmpty
+              ? const Center(child: Text('No Books Found'))
+              : ListView.builder(
+                  itemCount: booksListing.length,
+                  itemBuilder: (context, index) {
+                    return BookTile(book: booksListing[index]);
+                  },
+                ),
     );
   }
 }

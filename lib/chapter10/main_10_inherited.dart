@@ -1,12 +1,11 @@
-///Switching Themes using InheritedWidget
+/// Switching Themes using InheritedWidget
 import 'package:flutter/material.dart';
 
 import 'booklisting.dart';
 
-//void main() => runApp(BooksApp());
-
 class BooksApp extends StatelessWidget {
-  // This widget is the root of your application.
+  const BooksApp({super.key}); // Tambah const + super.key
+
   @override
   Widget build(BuildContext context) {
     return RootWidget(
@@ -20,10 +19,15 @@ class BooksApp extends StatelessWidget {
 class RootWidget extends StatefulWidget {
   final Widget child;
 
-  const RootWidget({Key key, @required this.child}) : super(key: key);
+  const RootWidget({
+    required this.child,
+    super.key, // Null-safety version
+  });
 
   static RootWidgetState of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<MyInheritedWidget>().data;
+    return context
+        .dependOnInheritedWidgetOfExactType<MyInheritedWidget>()!
+        .data;
   }
 
   @override
@@ -53,11 +57,11 @@ class RootWidgetState extends State<RootWidget> {
 class MyInheritedWidget extends InheritedWidget {
   final RootWidgetState data;
 
-  MyInheritedWidget({
-    Key key,
-    @required Widget child,
-    @required this.data,
-  }) : super(key: key, child: child);
+  const MyInheritedWidget({
+    required Widget child,
+    required this.data,
+    super.key,
+  }) : super(child: child);
 
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) {
@@ -68,10 +72,10 @@ class MyInheritedWidget extends InheritedWidget {
 class BooksAppScreen extends StatelessWidget {
   final Widget child;
 
-  BooksAppScreen({
-    Key key,
-    @required this.child,
-  }) : super(key: key);
+  const BooksAppScreen({
+    required this.child,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -82,11 +86,11 @@ class BooksAppScreen extends StatelessWidget {
           : themeData[1],
       home: Scaffold(
         appBar: AppBar(
-          leading: Icon(Icons.home),
-          title: Text("Books Listing"),
+          leading: const Icon(Icons.home),
+          title: const Text("Books Listing"),
           actions: [
             IconButton(
-              icon: Icon(Icons.all_inclusive),
+              icon: const Icon(Icons.all_inclusive),
               onPressed: () => RootWidget.of(context).switchTheme(),
             )
           ],
@@ -101,11 +105,13 @@ enum MyThemes { light, dark }
 
 final List<ThemeData> themeData = [
   ThemeData(
-      brightness: Brightness.light,
-      primaryColor: Colors.blue,
-      accentColor: Colors.lightBlueAccent),
+    brightness: Brightness.light,
+    primaryColor: Colors.blue,
+    secondaryHeaderColor: Colors.lightBlueAccent, // accentColor deprecated
+  ),
   ThemeData(
-      brightness: Brightness.dark,
-      primaryColor: Colors.orange,
-      accentColor: Colors.yellowAccent)
+    brightness: Brightness.dark,
+    primaryColor: Colors.orange,
+    secondaryHeaderColor: Colors.yellowAccent,
+  )
 ];

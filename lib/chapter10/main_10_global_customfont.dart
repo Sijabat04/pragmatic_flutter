@@ -1,20 +1,15 @@
 //Building BooksApp App's User Interface.
 //Custom Fonts demonstration
 import 'package:flutter/material.dart';
-
 import 'themes.dart';
 
-//Uncomment the line below to run from this file
 //void main() => runApp(BooksApp());
 
-//Showing book listing in ListView
 class BooksApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
-      //NEW CODE: theme property
       theme: defaultTheme,
       home: Scaffold(
         appBar: AppBar(
@@ -51,7 +46,7 @@ class BooksListing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: booksListing == null ? 0 : booksListing.length,
+      itemCount: booksListing.length, // ← FIXED
       itemBuilder: (context, index) {
         return Card(
           shape: RoundedRectangleBorder(
@@ -71,23 +66,21 @@ class BooksListing extends StatelessWidget {
                       Text(
                         '${booksListing[index]['title']}',
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      booksListing[index]['authors'] != null
-                          ? Text(
-                              'Author(s): ${booksListing[index]['authors'].join(", ")}',
-                              style: TextStyle(fontSize: 14),
-                            )
-                          : Text(""),
+                      Text(
+                        'Author(s): ${booksListing[index]['authors'].join(", ")}',
+                        style: TextStyle(fontSize: 14),
+                      ),
                     ],
                   ),
                 ),
-                booksListing[index]['image'] != null
-                    ? Image.asset(
-                        booksListing[index]['image'],
-                        fit: BoxFit.fill,
-                      )
-                    : Container(),
+                Image.asset(
+                  booksListing[index]['image'],
+                  fit: BoxFit.fill,
+                ),
               ],
             ),
           ),

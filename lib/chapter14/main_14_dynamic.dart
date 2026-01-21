@@ -82,7 +82,7 @@ class BooksListing extends StatefulWidget {
 }
 
 class _BooksListingState extends State<BooksListing> {
-  List<BookModel> booksListing;
+  List<BookModel> booksListing = [];
   fetchBooks() async {
     var response = await makeHttpCall();
 
@@ -104,7 +104,8 @@ class _BooksListingState extends State<BooksListing> {
         title: Text("Books Listing"),
       ),
       body: ListView.builder(
-        itemCount: booksListing == null ? 0 : booksListing.length,
+        // PERBAIKAN
+        itemCount: booksListing.length,
         itemBuilder: (context, index) {
           //Passing bookModelObj to BookTile widget
           return GestureDetector(

@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 
 import 'themes.dart';
 
+void main() {
+  runApp(BooksApp());
+}
 //Uncomment the line below to run from this file
 //void main() => runApp(BooksApp());
 
@@ -49,22 +52,29 @@ class BooksListing extends StatelessWidget {
       //ThemeData local to Card widget
       data: ThemeData(
         cardColor: Colors.pinkAccent,
-        //Creating local TextTheme
+
+        //Creating local TextTheme (updated to Material 3 style names)
         textTheme: TextTheme(
-          headline6: TextStyle(fontFamily: 'Pangolin', fontSize: 20),
-          //Extending on parent's TextTheme
-          bodyText2: Theme.of(context)
+          titleLarge: const TextStyle(
+            fontFamily: 'Pangolin',
+            fontSize: 20,
+          ),
+
+          //Extending parent's TextTheme
+          bodyMedium: Theme.of(context)
               .copyWith(
-                textTheme: TextTheme(
-                  bodyText2: TextStyle(fontStyle: FontStyle.italic),
+                textTheme: const TextTheme(
+                  bodyMedium: TextStyle(
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               )
               .textTheme
-              .bodyText2,
+              .bodyMedium,
         ),
       ),
       child: ListView.builder(
-        itemCount: booksListing == null ? 0 : booksListing.length,
+        itemCount: booksListing.length,
         itemBuilder: (context, index) {
           return Card(
             shape: RoundedRectangleBorder(
@@ -83,12 +93,12 @@ class BooksListing extends StatelessWidget {
                       children: <Widget>[
                         Text(
                           '${booksListing[index]['title']}',
-                          style: Theme.of(context).textTheme.headline6,
+                          style: Theme.of(context).textTheme.titleLarge,
                         ),
                         booksListing[index]['authors'] != null
                             ? Text(
                                 'Author(s): ${booksListing[index]['authors'].join(", ")}',
-                                style: Theme.of(context).textTheme.bodyText2,
+                                style: Theme.of(context).textTheme.bodyMedium,
                               )
                             : Text(""),
                       ],

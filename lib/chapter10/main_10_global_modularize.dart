@@ -48,7 +48,7 @@ class BooksListing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: booksListing == null ? 0 : booksListing.length,
+      itemCount: booksListing.length, // ✔ FIXED
       itemBuilder: (context, index) {
         return Card(
           shape: RoundedRectangleBorder(

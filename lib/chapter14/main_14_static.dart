@@ -15,7 +15,7 @@ import 'booktile.dart';
 //void main() => runApp(BooksApp());
 
 //The booksListing data is available global to app
-List<BookModel> booksListing;
+List<BookModel> booksListing = [];
 
 class BooksApp extends StatelessWidget {
   @override
@@ -81,7 +81,8 @@ class _BooksListingState extends State<BooksListing> {
         title: Text("Books Listing"),
       ),
       body: ListView.builder(
-        itemCount: booksListing == null ? 0 : booksListing.length,
+        // PERBAIKAN
+        itemCount: booksListing.length,
         itemBuilder: (context, index) {
           //Passing bookModelObj to BookTile widget
           return GestureDetector(
